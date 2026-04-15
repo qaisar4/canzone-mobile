@@ -4,33 +4,30 @@ export type AuthPayload = {
   email: string;
   password: string;
   name?: string;
+  role?: 'user' | 'artist';
 };
 
 export const userApi = {
   async login(payload: AuthPayload) {
     return apiClient.request({
-      endpoint: '/auth/login',
+      endpoint: '/api/v1/auth/login',
       method: 'POST',
       body: payload,
-      mockDelayMs: 400,
-      mockHandler: () => ({
-        token: 'mock-token',
-        email: payload.email,
-        name: 'Canzone User',
-      }),
     });
   },
   async signup(payload: AuthPayload) {
+    console.log('signup payload', payload);
+    console.log('signup url', '/api/v1/auth/signup');
     return apiClient.request({
-      endpoint: '/auth/signup',
+      endpoint: '/api/v1/auth/signup',
       method: 'POST',
       body: payload,
-      mockDelayMs: 500,
-      mockHandler: () => ({
-        token: 'mock-signup-token',
-        email: payload.email,
-        name: payload.name ?? 'New Listener',
-      }),
+    });
+  },
+  async deleteAccount() {
+    return apiClient.request({
+      endpoint: '/api/v1/auth/account',
+      method: 'DELETE',
     });
   },
 };

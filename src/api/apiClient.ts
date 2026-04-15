@@ -11,7 +11,7 @@ type RequestOptions<T> = {
   body?: unknown;
   headers?: Record<string, string>;
   mockDelayMs?: number;
-  mockHandler: () => Promise<T> | T;
+  mockHandler?: () => Promise<T> | T;
 };
 
 const buildUrl = (
@@ -55,15 +55,19 @@ export const apiClient = {
     mockHandler,
   }: RequestOptions<T>) {
     if (apiConfig.provider === 'mock') {
+      if (!mockHandler) {
+        throw new Error('Mock handler is required when API provider is mock');
+      }
       await wait(mockDelayMs);
       return mockHandler();
     }
 
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), apiConfig.timeoutMs);
+    const requestUrl = buildUrl(apiConfig.baseUrl, endpoint, query);
 
     try {
-      const response = await fetch(buildUrl(apiConfig.baseUrl, endpoint, query), {
+      const response = await fetch(requestUrl, {
         method,
         headers: {
           Accept: 'application/json',
@@ -75,6 +79,11 @@ export const apiClient = {
       });
 
       return await parseResponse<T>(response);
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new Error(`${error.message} (URL: ${requestUrl})`);
+      }
+      throw error;
     } finally {
       clearTimeout(timeout);
     }

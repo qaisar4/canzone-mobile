@@ -1,3 +1,5 @@
+import { Platform } from 'react-native';
+
 export type AppEnv = 'development' | 'staging' | 'production';
 export type ApiProvider = 'mock' | 'rest';
 
@@ -15,8 +17,11 @@ const runtimeBaseUrl = (globalThis as Record<string, unknown>)
 
 const env: AppEnv = __DEV__ ? 'development' : 'production';
 
+const developmentBaseUrl =
+  Platform.OS === 'android' ? 'http://10.0.2.2:3000' : 'http://localhost:3000';
+
 const baseUrls: Record<AppEnv, string> = {
-  development: 'https://dev-api.canzone.app',
+  development: developmentBaseUrl,
   staging: 'https://staging-api.canzone.app',
   production: 'https://api.canzone.app',
 };
@@ -24,7 +29,7 @@ const baseUrls: Record<AppEnv, string> = {
 const provider: ApiProvider =
   runtimeProvider === 'rest' || runtimeProvider === 'mock'
     ? runtimeProvider
-    : 'mock';
+    : 'rest';
 
 export const apiConfig: ApiConfig = {
   env,

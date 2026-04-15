@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import {
+  Alert,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -19,15 +20,22 @@ type Props = {
 };
 
 const LoginScreen = ({ onSuccess, onSwitchToSignup }: Props) => {
-  const [email, setEmail] = useState('hello@canzone.app');
-  const [password, setPassword] = useState('password123');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   const onLogin = async () => {
-    setIsLoading(true);
-    await userApi.login({ email, password });
-    setIsLoading(false);
-    onSuccess();
+    try {
+      setIsLoading(true);
+      await userApi.login({ email, password });
+      onSuccess();
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Login failed';
+      Alert.alert('Login Error', message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -46,15 +54,26 @@ const LoginScreen = ({ onSuccess, onSwitchToSignup }: Props) => {
           placeholderTextColor={palette.mutedText}
           autoCapitalize="none"
         />
-        <TextInput
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-          style={styles.input}
-          placeholder="Password"
-          placeholderTextColor={palette.mutedText}
-          autoCapitalize="none"
-        />
+        <View style={styles.passwordContainer}>
+          <TextInput
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry={!showPassword}
+            style={styles.passwordInput}
+            placeholder="Password"
+            placeholderTextColor={palette.mutedText}
+            autoCapitalize="none"
+          />
+          <Pressable
+            onPress={() => setShowPassword((prev) => !prev)}
+            style={styles.passwordToggleButton}
+            disabled={isLoading}
+          >
+            <Text style={styles.passwordToggleText}>
+              {showPassword ? 'Hide' : 'Show'}
+            </Text>
+          </Pressable>
+        </View>
         <PrimaryButton
           title={isLoading ? 'Please wait...' : 'Login'}
           onPress={onLogin}
@@ -92,6 +111,29 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
     borderWidth: 1,
     borderColor: palette.border,
+  },
+  passwordContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: palette.cardSecondary,
+    borderRadius: 12,
+    marginBottom: spacing.md,
+    borderWidth: 1,
+    borderColor: palette.border,
+  },
+  passwordInput: {
+    flex: 1,
+    color: palette.text,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+  },
+  passwordToggleButton: {
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+  },
+  passwordToggleText: {
+    color: palette.accent,
+    fontWeight: '600',
   },
   button: {
     marginTop: spacing.sm,
