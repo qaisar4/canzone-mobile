@@ -3,7 +3,7 @@ import { apiClient } from './apiClient';
 export type AuthPayload = {
   email: string;
   password: string;
-  name?: string;
+  username?: string;
   role?: 'user' | 'artist';
 };
 

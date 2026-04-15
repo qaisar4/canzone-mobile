@@ -18,7 +18,7 @@ const runtimeBaseUrl = (globalThis as Record<string, unknown>)
 const env: AppEnv = __DEV__ ? 'development' : 'production';
 
 const developmentBaseUrl =
-  Platform.OS === 'android' ? 'http://10.0.2.2:3000' : 'http://localhost:3000';
+  Platform.OS === 'android' ? 'http://192.168.0.56:3000' : 'http://localhost:3000';
 
 const baseUrls: Record<AppEnv, string> = {
   development: developmentBaseUrl,

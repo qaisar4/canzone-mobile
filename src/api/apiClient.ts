@@ -38,7 +38,22 @@ const parseResponse = async <T>(response: Response) => {
   const data = raw ? (JSON.parse(raw) as T) : ({} as T);
 
   if (!response.ok) {
-    throw new Error(`Request failed (${response.status})`);
+    const errorPayload = data as {
+      message?: string;
+      error?: string;
+      details?: unknown;
+      errors?: unknown;
+    };
+    const serverMessage =
+      errorPayload.message ||
+      errorPayload.error ||
+      (typeof errorPayload.details === 'string' ? errorPayload.details : '') ||
+      (typeof errorPayload.errors === 'string' ? errorPayload.errors : '');
+    throw new Error(
+      serverMessage
+        ? `Request failed (${response.status}): ${serverMessage}`
+        : `Request failed (${response.status})`,
+    );
   }
 
   return data;
@@ -65,6 +80,7 @@ export const apiClient = {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), apiConfig.timeoutMs);
     const requestUrl = buildUrl(apiConfig.baseUrl, endpoint, query);
+    console.log(`[API] ${method} ${requestUrl}`);
 
     try {
       const response = await fetch(requestUrl, {

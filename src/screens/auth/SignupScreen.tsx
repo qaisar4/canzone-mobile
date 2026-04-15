@@ -32,7 +32,7 @@ const SignupScreen = ({ onSuccess, onSwitchToLogin }: Props) => {
   const onSignup = async () => {
     try {
       setIsLoading(true);
-      await userApi.signup({ name, email, password, role });
+      await userApi.signup({ username: name, email, password, role });
       onSuccess();
     } catch (error) {
       console.error(error);
