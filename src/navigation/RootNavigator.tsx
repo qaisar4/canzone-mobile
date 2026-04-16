@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { tokenStore } from '../utils/tokenStore';
 import { AuthActionsProvider } from '../context/AuthActionsContext';
 import SplashScreen from '../screens/auth/SplashScreen';
 import AuthNavigator from './AuthNavigator';
@@ -17,7 +18,7 @@ const RootNavigator = () => {
   }
 
   return (
-    <AuthActionsProvider value={{ logout: () => setIsAuthenticated(false) }}>
+    <AuthActionsProvider value={{ logout: () => { tokenStore.clear(); setIsAuthenticated(false); } }}>
       <MainTabs />
     </AuthActionsProvider>
   );

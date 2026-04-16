@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import {
-  Alert,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -9,10 +8,13 @@ import {
   TextInput,
   View,
 } from 'react-native';
+import Toast from 'react-native-toast-message';
 import { userApi } from '../../api';
 import AuthHeader from '../../components/AuthHeader';
 import PrimaryButton from '../../components/PrimaryButton';
 import { palette, spacing } from '../../utils/theme';
+
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 type Props = {
   onSuccess: () => void;
@@ -25,14 +27,34 @@ const LoginScreen = ({ onSuccess, onSwitchToSignup }: Props) => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
+  const validate = (): string | null => {
+    if (!email.trim()) {
+      return 'Email is required.';
+    }
+    if (!EMAIL_REGEX.test(email.trim())) {
+      return 'Please enter a valid email address.';
+    }
+    if (!password) {
+      return 'Password is required.';
+    }
+    return null;
+  };
+
   const onLogin = async () => {
+    const validationError = validate();
+    if (validationError) {
+      Toast.show({ type: 'error', text1: validationError });
+      return;
+    }
+
     try {
       setIsLoading(true);
-      await userApi.login({ email, password });
+      await userApi.login({ email: email.trim(), password });
       onSuccess();
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Login failed';
-      Alert.alert('Login Error', message);
+      const raw = error instanceof Error ? error.message : 'Login failed. Please try again.';
+      const message = raw.replace(/\s*\(URL:.*\)$/, '');
+      Toast.show({ type: 'error', text1: message });
     } finally {
       setIsLoading(false);
     }

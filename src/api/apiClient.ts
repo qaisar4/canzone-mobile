@@ -1,3 +1,4 @@
+import { tokenStore } from '../utils/tokenStore';
 import { wait } from '../utils/helpers';
 import { apiConfig } from './config';
 
@@ -83,11 +84,13 @@ export const apiClient = {
     console.log(`[API] ${method} ${requestUrl}`);
 
     try {
+      const token = tokenStore.get();
       const response = await fetch(requestUrl, {
         method,
         headers: {
           Accept: 'application/json',
           'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
           ...headers,
         },
         body: body ? JSON.stringify(body) : undefined,

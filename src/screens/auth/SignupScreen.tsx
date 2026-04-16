@@ -33,7 +33,7 @@ const SignupScreen = ({ onSuccess, onSwitchToLogin }: Props) => {
 
   const validate = (): string | null => {
     if (!name.trim()) {
-      return 'Full name is required.';
+      return 'Username is required.';
     }
     if (!email.trim()) {
       return 'Email is required.';
@@ -81,8 +81,9 @@ const SignupScreen = ({ onSuccess, onSwitchToLogin }: Props) => {
           value={name}
           onChangeText={setName}
           style={styles.input}
-          placeholder="Full name"
+          placeholder="Username"
           placeholderTextColor={palette.mutedText}
+          autoCapitalize="none"
         />
         <TextInput
           value={email}
