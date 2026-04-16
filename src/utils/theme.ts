@@ -8,6 +8,7 @@ export const palette = {
   mutedText: '#A8B0D3',
   border: '#2A335F',
   success: '#34D399',
+  error: '#EF4444',
 };
 
 export const spacing = {

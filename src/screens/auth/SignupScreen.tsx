@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import {
-  Alert,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -9,6 +8,7 @@ import {
   TextInput,
   View,
 } from 'react-native';
+import Toast from 'react-native-toast-message';
 import { userApi } from '../../api';
 import AuthHeader from '../../components/AuthHeader';
 import PrimaryButton from '../../components/PrimaryButton';
@@ -21,6 +21,8 @@ type Props = {
 
 type SignupRole = 'user' | 'artist';
 
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 const SignupScreen = ({ onSuccess, onSwitchToLogin }: Props) => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -29,15 +31,40 @@ const SignupScreen = ({ onSuccess, onSwitchToLogin }: Props) => {
   const [role, setRole] = useState<SignupRole>('user');
   const [isLoading, setIsLoading] = useState(false);
 
+  const validate = (): string | null => {
+    if (!name.trim()) {
+      return 'Full name is required.';
+    }
+    if (!email.trim()) {
+      return 'Email is required.';
+    }
+    if (!EMAIL_REGEX.test(email.trim())) {
+      return 'Please enter a valid email address.';
+    }
+    if (!password) {
+      return 'Password is required.';
+    }
+    if (password.length < 8) {
+      return 'Password must be at least 8 characters.';
+    }
+    return null;
+  };
+
   const onSignup = async () => {
+    const validationError = validate();
+    if (validationError) {
+      Toast.show({ type: 'error', text1: validationError });
+      return;
+    }
+
     try {
       setIsLoading(true);
-      await userApi.signup({ username: name, email, password, role });
+      await userApi.signup({ username: name.trim(), email: email.trim(), password, role });
       onSuccess();
     } catch (error) {
-      console.error(error);
-      const message = error instanceof Error ? error.message : 'Signup failed';
-      Alert.alert('Signup Error', message);
+      const raw = error instanceof Error ? error.message : 'Signup failed. Please try again.';
+      const message = raw.replace(/\s*\(URL:.*\)$/, '');
+      Toast.show({ type: 'error', text1: message });
     } finally {
       setIsLoading(false);
     }
