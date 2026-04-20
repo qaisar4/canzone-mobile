@@ -49,8 +49,9 @@ const LoginScreen = ({ onSuccess, onSwitchToSignup }: Props) => {
 
     try {
       setIsLoading(true);
-      await userApi.login({ email: email.trim(), password });
+      const response = await userApi.login({ email: email.trim(), password });
       onSuccess();
+      Toast.show({ type: 'success', text1: response?.data?.message ?? 'Login successful' });
     } catch (error) {
       const raw = error instanceof Error ? error.message : 'Login failed. Please try again.';
       const message = raw.replace(/\s*\(URL:.*\)$/, '');

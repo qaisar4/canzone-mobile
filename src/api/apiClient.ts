@@ -41,13 +41,15 @@ const parseResponse = async <T>(response: Response) => {
   if (!response.ok) {
     const errorPayload = data as {
       message?: string;
-      error?: string;
+      error?: string | { code?: string; message?: string };
       details?: unknown;
       errors?: unknown;
     };
     const serverMessage =
       errorPayload.message ||
-      errorPayload.error ||
+      (typeof errorPayload.error === 'string'
+        ? errorPayload.error
+        : errorPayload.error?.message) ||
       (typeof errorPayload.details === 'string' ? errorPayload.details : '') ||
       (typeof errorPayload.errors === 'string' ? errorPayload.errors : '');
     throw new Error(

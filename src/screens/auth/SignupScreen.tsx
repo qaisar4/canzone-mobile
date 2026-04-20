@@ -59,8 +59,9 @@ const SignupScreen = ({ onSuccess, onSwitchToLogin }: Props) => {
 
     try {
       setIsLoading(true);
-      await userApi.signup({ username: name.trim(), email: email.trim(), password, role });
+    const response = await userApi.signup({ username: name.trim(), email: email.trim(), password, role });
       onSuccess();
+    Toast.show({ type: 'success', text1: response?.data?.message ?? 'Signup successful' });
     } catch (error) {
       const raw = error instanceof Error ? error.message : 'Signup failed. Please try again.';
       const message = raw.replace(/\s*\(URL:.*\)$/, '');
