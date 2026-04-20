@@ -57,6 +57,15 @@ export const userApi = {
     userStore.clear();
     return res;
   },
+  async logout() {
+    const res = await apiClient.request<{ data: { message: string } }>({
+      endpoint: '/api/v1/auth/logout',
+      method: 'POST',
+    });
+    tokenStore.clear();
+    userStore.clear();
+    return res;
+  },
   async getProfile() {
     const res = await apiClient.request<{ data: { user: UserProfile } }>({
       endpoint: '/api/v1/users/profile',

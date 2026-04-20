@@ -1,7 +1,7 @@
 import React, { createContext, useContext } from 'react';
 
 type AuthActions = {
-  logout: () => void;
+  logout: () => void | Promise<void>;
 };
 
 const AuthActionsContext = createContext<AuthActions | null>(null);

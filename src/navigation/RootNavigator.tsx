@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { tokenStore } from '../utils/tokenStore';
+import Toast from 'react-native-toast-message';
+import { userApi } from '../api/userApi';
 import { userStore } from '../utils/userStore';
 import { AuthActionsProvider } from '../context/AuthActionsContext';
 import SplashScreen from '../screens/auth/SplashScreen';
@@ -30,10 +31,17 @@ const RootNavigator = () => {
   return (
     <AuthActionsProvider
       value={{
-        logout: () => {
-          tokenStore.clear();
-          userStore.clear();
-          setIsAuthenticated(false);
+        logout: async () => {
+          try {
+           const response = await userApi.logout();
+            Toast.show({ type: 'success', text1: response?.data?.message });
+          } catch (error) {
+            const raw = error instanceof Error ? error.message : 'Logout failed. Please try again.';
+            const message = raw.replace(/\s*\(URL:.*\)$/, '');
+            Toast.show({ type: 'error', text1: message });
+          } finally {
+            setIsAuthenticated(false);
+          }
         },
       }}
     >
