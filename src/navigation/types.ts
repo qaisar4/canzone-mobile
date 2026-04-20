@@ -8,3 +8,9 @@ export type MainTabParamList = {
   RandomSongs: undefined;
   Profile: undefined;
 };
+
+export type ArtistTabParamList = {
+  ArtistAlbums: undefined;
+  Upload: undefined;
+  Profile: undefined;
+};

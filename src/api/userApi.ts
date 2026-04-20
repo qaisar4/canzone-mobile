@@ -1,4 +1,5 @@
 import { tokenStore } from '../utils/tokenStore';
+import { userStore } from '../utils/userStore';
 import { apiClient } from './apiClient';
 
 export type AuthPayload = {
@@ -35,6 +36,7 @@ export const userApi = {
 
     console.log("Access token is here", res.data?.accessToken);
     if (res.data?.accessToken) tokenStore.set(res.data.accessToken);
+    if (res.data?.user) userStore.set(res.data.user);
     return res;
   },
   async signup(payload: AuthPayload) {
@@ -44,13 +46,16 @@ export const userApi = {
       body: payload,
     });
     if (res.data?.accessToken) tokenStore.set(res.data.accessToken);
+    if (res.data?.user) userStore.set(res.data.user);
     return res;
   },
   async deleteAccount() {
-    return apiClient.request({
+    const res = await apiClient.request({
       endpoint: '/api/v1/auth/account',
       method: 'DELETE',
     });
+    userStore.clear();
+    return res;
   },
   async getProfile() {
     const res = await apiClient.request<{ data: { user: UserProfile } }>({

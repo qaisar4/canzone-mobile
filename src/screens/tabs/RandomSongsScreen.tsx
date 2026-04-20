@@ -11,8 +11,8 @@ const RandomSongsScreen = () => {
   const [refreshing, setRefreshing] = useState(false);
 
   const loadSongs = async () => {
-    const result = await songsApi.getRandomSongs(4);
-    setSongs(result);
+    // const result = await songsApi.getRandomSongs(4);
+    // setSongs(result);
   };
 
   useEffect(() => {
