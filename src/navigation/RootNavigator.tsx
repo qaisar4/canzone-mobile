@@ -33,10 +33,22 @@ const RootNavigator = () => {
       value={{
         logout: async () => {
           try {
-           const response = await userApi.logout();
+            const response = await userApi.logout();
             Toast.show({ type: 'success', text1: response?.data?.message });
           } catch (error) {
             const raw = error instanceof Error ? error.message : 'Logout failed. Please try again.';
+            const message = raw.replace(/\s*\(URL:.*\)$/, '');
+            Toast.show({ type: 'error', text1: message });
+          } finally {
+            setIsAuthenticated(false);
+          }
+        },
+        deleteAccount: async () => {
+          try {
+            const response = await userApi.deleteAccount();
+            Toast.show({ type: 'success', text1: response?.data?.message ?? 'Account deleted successfully' });
+          } catch (error) {
+            const raw = error instanceof Error ? error.message : 'Failed to delete account. Please try again.';
             const message = raw.replace(/\s*\(URL:.*\)$/, '');
             Toast.show({ type: 'error', text1: message });
           } finally {

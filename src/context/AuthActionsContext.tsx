@@ -2,6 +2,7 @@ import React, { createContext, useContext } from 'react';
 
 type AuthActions = {
   logout: () => void | Promise<void>;
+  deleteAccount: () => void | Promise<void>;
 };
 
 const AuthActionsContext = createContext<AuthActions | null>(null);

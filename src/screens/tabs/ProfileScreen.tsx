@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import {
+  Alert,
   ActivityIndicator,
   Pressable,
   RefreshControl,
@@ -16,13 +17,14 @@ import { getGreetingByTime } from '../../utils/helpers';
 import { palette, spacing } from '../../utils/theme';
 
 const ProfileScreen = () => {
-  const { logout } = useAuthActions();
+  const { logout, deleteAccount } = useAuthActions();
   const [profile, setProfile] = useState<UserProfile | null>(null);
 
   console.log("Profile screen is here");
   console.log("Profile is here", profile);
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isDeletingAccount, setIsDeletingAccount] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const fetchProfile = useCallback(async (silent = false) => {
@@ -43,6 +45,28 @@ const ProfileScreen = () => {
   useEffect(() => {
     fetchProfile();
   }, [fetchProfile]);
+
+  const onDeleteAccount = () => {
+    Alert.alert(
+      'Delete Account',
+      'Are you sure you want to permanently delete your account? This action cannot be undone.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: async () => {
+            setIsDeletingAccount(true);
+            try {
+              await deleteAccount();
+            } finally {
+              setIsDeletingAccount(false);
+            }
+          },
+        },
+      ],
+    );
+  };
 
   const onRefresh = () => {
     setIsRefreshing(true);
@@ -110,6 +134,12 @@ const ProfileScreen = () => {
       {renderContent()}
 
       <PrimaryButton title="Logout" onPress={logout} style={styles.logoutButton} />
+      <PrimaryButton
+        title={isDeletingAccount ? 'Deleting...' : 'Delete Account'}
+        onPress={onDeleteAccount}
+        style={styles.deleteButton}
+        disabled={isDeletingAccount}
+      />
 
     </ScrollView>
   );
@@ -205,6 +235,9 @@ const styles = StyleSheet.create({
     fontSize: 13,
   },
   logoutButton: {
+    marginTop: spacing.sm,
+  },
+  deleteButton: {
     marginTop: spacing.sm,
   },
 });

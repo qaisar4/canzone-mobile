@@ -50,10 +50,11 @@ export const userApi = {
     return res;
   },
   async deleteAccount() {
-    const res = await apiClient.request({
+    const res = await apiClient.request<{ data: { message: string } }>({
       endpoint: '/api/v1/auth/account',
       method: 'DELETE',
     });
+    tokenStore.clear();
     userStore.clear();
     return res;
   },
